@@ -24,9 +24,17 @@ export class RendererController {
     const context = canvas.getContext("2d");
 
     const background = await loadImage('https://grandint.sirv.com/Images/background.jpg');
-    const user = await loadImage('https://grandint.sirv.com/Images/default.jpg');
     const confetti = await loadImage('https://grandint.sirv.com/Images/confetti.png');
     const cake = await loadImage('https://grandint.sirv.com/Images/cake.png');
+
+    let user
+    try {
+      user = await loadImage(`https://grandint.sirv.com/Images/users/${query.uid}.jpg`)
+    } catch (error) {
+      console.log(error)
+      user = await loadImage('https://grandint.sirv.com/Images/default.jpg');
+    }
+
     context.drawImage(background, 0, 0, 1920, 1080);
 
     // add confetti
