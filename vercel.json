@@ -6,7 +6,7 @@
         "use": "@vercel/node"
       }
   ],
-  "buildCommand":"./scripts/setup.sh && nest build",
+  "installCommand":"./scripts/setup.sh && yarn install",
   "routes": [
       {
         "src": "/(.*)",
