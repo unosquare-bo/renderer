@@ -6,7 +6,6 @@
         "use": "@vercel/node"
       }
   ],
-  "installCommand":"./scripts/setup.sh && yarn install",
   "routes": [
       {
         "src": "/(.*)",
