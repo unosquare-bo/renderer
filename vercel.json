@@ -6,6 +6,7 @@
         "use": "@vercel/node"
       }
   ],
+  "buildCommand":"./scripts/setup.sh && nest build",
   "routes": [
       {
         "src": "/(.*)",
