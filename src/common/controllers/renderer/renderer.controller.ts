@@ -1,5 +1,5 @@
 import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 @Controller('renderer')
 export class RendererController {
