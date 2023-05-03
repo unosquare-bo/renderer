@@ -5,7 +5,7 @@ export class RendererService {
   genericTitle = 'Congratulations!';
   topicTitles = {
     'birthday': 'Happy Birthday!',
-    'promotion': 'Congratulations for the promotion!',
+    'promotion': 'You just got promoted!',
   };
 
   getTitle(topic: string): string {
