@@ -1,8 +1,11 @@
 import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { RendererService } from 'src/common/services/renderer/renderer.service';
 
 @Controller('renderer')
 export class RendererController {
+  constructor(private readonly rendererService: RendererService) {}
+
   @Get()
   @Header('Content-Type', 'image/png')
   async renderCongrats(@Query() query): Promise<StreamableFile> {
@@ -11,7 +14,7 @@ export class RendererController {
 
     // Add post object with the content to render
     const post = {
-      title: 'Happy Birthday!',
+      title: this.rendererService.getTitle(query.topic),
       subtitle: [
         'Another adventure-filled year awaits you,',
         'and we hope this one is filled with love,',
