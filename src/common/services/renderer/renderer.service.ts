@@ -1,12 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-
-interface ImageData {
-  imageKey: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import ImageData from '../../types/ImageData';
 
 @Injectable()
 export class RendererService {
