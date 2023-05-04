@@ -1,17 +1,37 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
+interface ImageData {
+  imageKey: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 @Injectable()
 export class RendererService {
   genericTitle = 'Congratulations!';
-  topicTitles = {
-    birthday: 'Happy Birthday!',
-    promotion: 'You just got promoted!',
+  topicImages = {
+    birthday: [
+      {
+        imageKey: 'cake.png',
+        x: 120,
+        y: 80,
+        width: 640,
+        height: 463
+      }
+    ],
+    sat: [],
+    bonus: [],
+    promotion: [],
+    anniversary: [],
+    congrats: []
   };
   charactersPerLine = 40;
   maxSubtitleLength = 200;
 
-  getTitle(topic: string): string {
-    return this.topicTitles[topic] || this.genericTitle;
+  getTitle(title: string): string {
+    return title || this.genericTitle;
   }
 
   splitSubtitle(subtitle: string): string[] {
@@ -32,5 +52,9 @@ export class RendererService {
       }
     });
     return lines;
+  }
+
+  getImagesForTopic(topic: string): ImageData[] {
+    return this.topicImages[topic];
   }
 }
