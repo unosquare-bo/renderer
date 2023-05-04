@@ -15,12 +15,7 @@ export class RendererController {
     // Add post object with the content to render
     const post = {
       title: this.rendererService.getTitle(query.topic),
-      subtitle: [
-        'Another adventure-filled year awaits you,',
-        'and we hope this one is filled with love,',
-        'laughter, and plenty of cake. Wishing you',
-        'all the great things in life'
-      ]
+      subtitle: this.rendererService.splitSubtitle(query.subtitle)
     }
 
     const canvas = createCanvas(width, height);
