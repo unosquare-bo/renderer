@@ -55,6 +55,6 @@ export class RendererService {
   }
 
   getImagesForTopic(topic: string): ImageData[] {
-    return this.topicImages[topic];
+    return this.topicImages[topic] || [];
   }
 }
