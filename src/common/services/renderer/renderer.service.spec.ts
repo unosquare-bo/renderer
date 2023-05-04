@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RendererService } from './renderer.service';
+import { BadRequestException } from '@nestjs/common';
 
-describe('TweetsService', () => {
+describe('RendererService', () => {
   let service: RendererService;
 
   beforeEach(async () => {
@@ -24,5 +25,26 @@ describe('TweetsService', () => {
   it('should return Congratulations if topic is not birthday/promotion', () => {
     const title = service.getTitle('something');
     expect(title).toBe('Congratulations!');
+  });
+
+  it('should throw exception if subtitle exceeds characters', async () => {
+    const longText = 'Test test test test test test test test test test test test test test test test test test test test Test test test test test test test test test test test test test test test test test test test test test test test test test';
+    try {
+      await service.splitSubtitle(longText);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+    }
+  });
+
+  it('should return text split in 5 lines', () => {
+    const subtitle = 'Another adventure-filled year awaits you, and we hope this one is filled with love, laughter and plenty of cake. Wishing you all the great things in life.';
+    const lines = [
+      'Another adventure-filled year awaits',
+      'you, and we hope this one is filled',
+      'with love, laughter and plenty of cake.',
+      'Wishing you all the great things in',
+      'life.'
+    ];
+    expect(service.splitSubtitle(subtitle)).toEqual(lines);
   });
 });
