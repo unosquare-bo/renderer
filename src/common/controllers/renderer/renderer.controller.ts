@@ -1,6 +1,6 @@
 import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { RendererService } from 'src/common/services/renderer/renderer.service';
+import { RendererService } from '../../services/renderer/renderer.service';
 import { ConfigService } from '@nestjs/config';
 
 @Controller('renderer')
