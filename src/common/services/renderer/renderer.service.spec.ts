@@ -17,13 +17,13 @@ describe('RendererService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return Happy Birthday if topic is birthday', () => {
-    const title = service.getTitle('birthday');
+  it('should return Happy Birthday if title is Happy Birthday', () => {
+    const title = service.getTitle('Happy Birthday!');
     expect(title).toBe('Happy Birthday!');
   });
 
-  it('should return Congratulations if topic is not birthday/promotion', () => {
-    const title = service.getTitle('something');
+  it('should return Congratulations if no title is provided', () => {
+    const title = service.getTitle(null);
     expect(title).toBe('Congratulations!');
   });
 
@@ -46,5 +46,24 @@ describe('RendererService', () => {
       'life.'
     ];
     expect(service.splitSubtitle(subtitle)).toEqual(lines);
+  });
+
+  it('should return the images for birthday topic', () => {
+    const topic = 'birthday';
+    const birthdayImages = [
+      {
+        imageKey: 'cake.png',
+        x: 120,
+        y: 80,
+        width: 640,
+        height: 463
+      }
+    ]
+    expect(service.getImagesForTopic(topic)).toEqual(birthdayImages);
+  });
+
+  it('should return empty images array for unknown topic', () => {
+    const topic = 'unknown';
+    expect(service.getImagesForTopic(topic)).toEqual([]);
   });
 });
