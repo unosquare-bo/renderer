@@ -1,10 +1,11 @@
 import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { RendererService } from '../../services/renderer/renderer.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('renderer')
 export class RendererController {
-  constructor(private readonly rendererService: RendererService) {}
+  constructor(private readonly rendererService: RendererService, private configService: ConfigService) { }
 
   @Get()
   @Header('Content-Type', 'image/png')
@@ -14,7 +15,7 @@ export class RendererController {
 
     // Add post object with the content to render
     const post = {
-      title: this.rendererService.getTitle(query.topic),
+      title: this.rendererService.getTitle(query.title),
       subtitle: this.rendererService.splitSubtitle(query.subtitle)
     }
 
@@ -23,7 +24,6 @@ export class RendererController {
 
     const background = await loadImage('https://grandint.sirv.com/Images/background.jpg');
     const confetti = await loadImage('https://grandint.sirv.com/Images/confetti.png');
-    const cake = await loadImage('https://grandint.sirv.com/Images/cake.png');
 
     let user
     try {
@@ -35,6 +35,12 @@ export class RendererController {
 
     context.drawImage(background, 0, 0, 1920, 1080);
 
+    const topicImages = this.rendererService.getImagesForTopic(query.topic);
+    for (const { imageKey, x, y, width, height } of topicImages) {
+      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/${imageKey}`);
+      context.drawImage(image, x, y, width, height);
+    }
+
     // add confetti
     context.drawImage(confetti, 896, 120, 1024, 678);
     // Render User
@@ -44,11 +50,8 @@ export class RendererController {
     context.font = "bold 45pt 'Segoe UI'";
     context.textAlign = "center";
     context.fillStyle = "#000";
-    
-    const center = 450
 
-    // Render Cake
-    context.drawImage(cake, 120, 80, 640, 463);
+    const center = 450
 
     context.fillText(query.name, width - 480, 720);
     context.fillText(query.date, width - 480, 820);
