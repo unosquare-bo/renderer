@@ -1,8 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import ImageData from '../../types/ImageData';
+import { SirvCdnService } from '../sirv-cdn/sirv-cdn.service';
 
 @Injectable()
 export class RendererService {
+  constructor(private readonly sirvCdnService: SirvCdnService) { }
+
   genericTitle = 'Congratulations!';
   topicImages = {
     birthday: [
@@ -48,7 +51,7 @@ export class RendererService {
   }
 
   getImagesForTopic(topic: string): ImageData[] {
-    // return this.topicImages[topic] || [];
-    `https://api.sirv.com/v2/files/readdir?dirname=/Images/${topic}`
+    this.sirvCdnService.getTopicImages(topic).subscribe(response => console.log(response.data));
+    return this.topicImages[topic] || [];
   }
 }
