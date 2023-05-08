@@ -48,7 +48,6 @@ export class RendererService {
   }
 
   getImagesForTopic(topic: string): ImageData[] {
-    // return this.topicImages[topic] || [];
-    `https://api.sirv.com/v2/files/readdir?dirname=/Images/${topic}`
+    return this.topicImages[topic] || [];
   }
 }
