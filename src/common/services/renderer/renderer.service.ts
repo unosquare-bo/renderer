@@ -1,28 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import ImageData from '../../types/ImageData';
 import { SirvCdnService } from '../sirv-cdn/sirv-cdn.service';
+import { Observable, map } from 'rxjs';
 
 @Injectable()
 export class RendererService {
   constructor(private readonly sirvCdnService: SirvCdnService) { }
 
   genericTitle = 'Congratulations!';
-  topicImages = {
-    birthday: [
-      {
-        imageKey: 'cake.png',
-        x: 120,
-        y: 80,
-        width: 640,
-        height: 463
-      }
-    ],
-    sat: [],
-    bonus: [],
-    promotion: [],
-    anniversary: [],
-    congrats: []
-  };
+  topicImages = [
+    {
+      fileName: 'cake.png',
+      x: 120,
+      y: 80,
+    }
+  ];
   charactersPerLine = 40;
   maxSubtitleLength = 200;
 
@@ -50,8 +42,12 @@ export class RendererService {
     return lines;
   }
 
-  getImagesForTopic(topic: string): ImageData[] {
-    this.sirvCdnService.getTopicImages(topic).subscribe(response => console.log(response.data));
-    return this.topicImages[topic] || [];
+  getImagesForTopic(topic: string): Observable<ImageData[]> {
+    return this.sirvCdnService.getTopicImages(topic).pipe(map(({ data }) => {
+      return data.contents.map(({ filename, meta }) => {
+        const file = this.topicImages.find(({ fileName }) => fileName === filename);
+        return { ...file, width: meta.width, height: meta.height };
+      });
+    }));
   }
 }
