@@ -8,7 +8,7 @@ export class RendererService {
   constructor(private readonly sirvCdnService: SirvCdnService) { }
 
   genericTitle = 'Congratulations!';
-  topicImages = [
+  topicImages: Partial<ImageData>[] = [
     {
       fileName: 'cake.png',
       x: 120,
