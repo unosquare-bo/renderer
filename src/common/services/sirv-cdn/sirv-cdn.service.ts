@@ -1,15 +1,28 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AxiosResponse } from 'axios';
-import { Observable } from 'rxjs';
 import SirvCdnTokenResponse from '../../types/SirvCdnTokenResponse';
+import { Observable, map } from 'rxjs';
+import { AxiosResponse } from 'axios';
+
+interface FolderContentsCdnResponse {
+  contents: FileDataCdn
+}
+interface FileDataCdn {
+  filename: string;
+  meta: FileMetaData;
+}
+
+interface FileMetaData {
+  width: number;
+  height: number;
+}
 
 @Injectable()
 export class SirvCdnService {
   constructor(private configService: ConfigService, private readonly httpService: HttpService) {
     httpService.axiosRef.interceptors.response.use(config => {
-      console.log('getToken', this.token);
+      console.log('getTokenCdn', this.token);
       return {
         ...config,
         headers: { ...config.headers, Authorization: `Bearer ${this.token}` }
@@ -20,13 +33,13 @@ export class SirvCdnService {
         return response;
       },
       async error => {
-        console.log('error', error);
+        console.log('errorcdn');
         const originalConfig = error.config;
         if (error.response.status === 401 && !originalConfig._retry) {
           originalConfig._retry = true;
           const { token } = await this.refreshToken();
           this.token = token;
-          console.log('setToken', this.token);
+          console.log('setTokenCdn', this.token);
           originalConfig.headers.Authorization = `Bearer ${token}`;
           return httpService.axiosRef(originalConfig);
         }
@@ -36,7 +49,7 @@ export class SirvCdnService {
   baseUrl = this.configService.get('CDN_API_URL');
   token = '';
 
-  refreshToken(): Promise<SirvCdnTokenResponse> {
+  async refreshToken(): Promise<SirvCdnTokenResponse> {
     return this.httpService.axiosRef.post(`${this.baseUrl}/token`, {
       clientId: this.configService.get('CDN_CLIENT_ID'),
       clientSecret: this.configService.get('CDN_CLIENT_SECRET')
@@ -44,7 +57,8 @@ export class SirvCdnService {
       .then(response => response.data);
   }
 
-  getTopicImages(topic: string) {
+  getTopicImages(topic: string): Observable<AxiosResponse<FileDataCdn[]>> {
     return this.httpService.get(`${this.baseUrl}/files/readdir?dirname=/Images/topics/${topic}`)
+      .pipe(map(({ data }) => data.contents));
   }
 }

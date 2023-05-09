@@ -1,11 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import ImageData from '../../types/ImageData';
 import { SirvCdnService } from '../sirv-cdn/sirv-cdn.service';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
+import { SlackBotApiService } from '../slack-bot-api/slack-bot-api.service';
 
 @Injectable()
 export class RendererService {
-  constructor(private readonly sirvCdnService: SirvCdnService) { }
+  constructor(
+    private readonly sirvCdnService: SirvCdnService,
+    private readonly slackBotApiService: SlackBotApiService
+  ) { }
 
   genericTitle = 'Congratulations!';
   topicImages: Partial<ImageData>[] = [
@@ -43,11 +47,17 @@ export class RendererService {
   }
 
   getImagesForTopic(topic: string): Observable<ImageData[]> {
-    return this.sirvCdnService.getTopicImages(topic).pipe(map(({ data }) => {
-      return data.contents.map(({ filename, meta }) => {
-        const file = this.topicImages.find(({ fileName }) => fileName === filename);
-        return { ...file, width: meta.width, height: meta.height };
-      });
-    }));
+    return this.sirvCdnService.getTopicImages(topic).pipe(
+      switchMap(({ data: cdnImages }) => {
+        const fileNames = cdnImages.map(({ filename }) => filename);
+        return this.slackBotApiService.getImagesData(fileNames)
+          .pipe(
+            map(({ data: imagesData }) => {
+              return cdnImages.map(({ filename, meta }) => {
+                const file = imagesData.find(({ fileName }) => fileName === filename);
+                return { ...file, width: meta.width, height: meta.height };
+              });
+            }))
+      }));
   }
 }
