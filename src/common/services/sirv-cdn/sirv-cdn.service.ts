@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import SirvCdnTokenResponse from '../../types/SirvCdnTokenResponse';
 import { Observable, map, tap } from 'rxjs';
-import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 interface FolderContentsCdnResponse {
   contents: FileDataCdn
@@ -23,10 +22,7 @@ export class SirvCdnService {
   constructor(private configService: ConfigService, private readonly httpService: HttpService) {
     this.httpService.axiosRef.interceptors.request.use(config => {
       if (config.url.includes(this.configService.get('CDN_API_URL'))) {
-        return {
-          ...config,
-          headers: { ...config.headers, Authorization: `Bearer ${this.token}` }
-        } as InternalAxiosRequestConfig;
+        config.headers.Authorization = `Bearer ${this.token}`;
       }
       return config;
     });
@@ -36,15 +32,16 @@ export class SirvCdnService {
       },
       async error => {
         const originalConfig = error.config;
-        if (originalConfig.url.includes(this.configService.get('CDN_API_URL'))) {
-          if (error.response.status === 401 && !originalConfig._retry) {
-            originalConfig._retry = true;
-            const { token } = await this.refreshToken();
-            this.token = token;
-            originalConfig.headers.Authorization = `Bearer ${token}`;
-            return this.httpService.axiosRef(originalConfig);
-          }
-          return Promise.reject(error);
+        if (
+          originalConfig.url.includes(this.configService.get('CDN_API_URL')) &&
+          error.response.status === 401 &&
+          !originalConfig._retry
+        ) {
+          originalConfig._retry = true;
+          const { token } = await this.refreshToken();
+          this.token = token;
+          originalConfig.headers.Authorization = `Bearer ${token}`;
+          return this.httpService.axiosRef(originalConfig);
         }
         return Promise.reject(error);
       });
