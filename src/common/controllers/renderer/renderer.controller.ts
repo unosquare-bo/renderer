@@ -38,7 +38,7 @@ export class RendererController {
 
     const topicImages = await firstValueFrom(this.rendererService.getImagesForTopic(query.topic));
     for (const { fileName, x, y, width, height } of topicImages) {
-      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/${fileName}`);
+      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/topics/${query.topic}/${fileName}`);
       context.drawImage(image, x, y, width, height);
     }
 
