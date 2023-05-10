@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import ImageData from '../../types/ImageData';
 import { SirvCdnService } from '../sirv-cdn/sirv-cdn.service';
-import { Observable, map, of, switchMap } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import { SlackBotApiService } from '../slack-bot-api/slack-bot-api.service';
 
 @Injectable()
