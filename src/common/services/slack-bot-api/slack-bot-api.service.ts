@@ -1,8 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AxiosResponse } from 'axios';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 interface ImageDataAPI {
   id: number;
@@ -53,8 +52,9 @@ export class SlackBotApiService {
       .then(response => response.data);
   }
 
-  getImagesData(fileNames: string[]): Observable<AxiosResponse<ImageDataAPI[]>> {
+  getImagesData(fileNames: string[]): Observable<ImageDataAPI[]> {
     const fileNamesString = fileNames.join(',');
     return this.httpService.get(`${this.baseUrl}/image/names/${fileNamesString}`)
+      .pipe(map(({ data }) => data));
   }
 }

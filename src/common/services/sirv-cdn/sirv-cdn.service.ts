@@ -60,7 +60,6 @@ export class SirvCdnService {
 
   getTopicImages(topic: string): Observable<FileDataCdn[]> {
     return this.httpService.get(`${this.baseUrl}/files/readdir?dirname=/Images/topics/${topic}`)
-      .pipe(
-        map(({ data }) => data.contents));
+      .pipe(map(({ data }) => data.contents));
   }
 }

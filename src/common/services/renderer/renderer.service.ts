@@ -12,13 +12,6 @@ export class RendererService {
   ) { }
 
   genericTitle = 'Congratulations!';
-  topicImages: Partial<ImageData>[] = [
-    {
-      fileName: 'cake.png',
-      x: 120,
-      y: 80,
-    }
-  ];
   charactersPerLine = 40;
   maxSubtitleLength = 200;
 
@@ -52,9 +45,9 @@ export class RendererService {
         const fileNames = cdnImages.map(({ filename }) => filename);
         return this.slackBotApiService.getImagesData(fileNames)
           .pipe(
-            map(({ data }) => {
+            map(imagesData => {
               return cdnImages.map(({ filename, meta }) => {
-                const file = data.find(({ fileName }) => fileName === filename);
+                const file = imagesData.find(({ fileName }) => fileName === filename);
                 return { ...file, width: meta.width, height: meta.height };
               });
             }))
