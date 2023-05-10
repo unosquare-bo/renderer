@@ -2,13 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map } from 'rxjs';
-
-interface ImageDataAPI {
-  id: number;
-  fileName: string;
-  x: number;
-  y: number;
-}
+import { SlackBotApiTokenResponse, SlackBotApiImageData } from './slack-bot-api.types';
 
 @Injectable()
 export class SlackBotApiService {
@@ -44,15 +38,15 @@ export class SlackBotApiService {
   baseUrl = this.configService.get('SLACKBOT_API_URL');
   token = '';
 
-  async refreshToken(): Promise<{ token: string }> {
+  async refreshToken(): Promise<SlackBotApiTokenResponse> {
     return this.httpService.axiosRef.post(`${this.baseUrl}/auth/signin`, {
-      email: 'test@test.com',
-      password: 'password'
+      email: this.configService.get('SLACKBOT_API_EMAIL'),
+      password: this.configService.get('SLACKBOT_API_PASSWORD')
     })
       .then(response => response.data);
   }
 
-  getImagesData(fileNames: string[]): Observable<ImageDataAPI[]> {
+  getImagesData(fileNames: string[]): Observable<SlackBotApiImageData[]> {
     const fileNamesString = fileNames.join(',');
     return this.httpService.get(`${this.baseUrl}/image/names/${fileNamesString}`)
       .pipe(map(({ data }) => data));

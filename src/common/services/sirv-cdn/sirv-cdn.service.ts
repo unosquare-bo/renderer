@@ -1,21 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import SirvCdnTokenResponse from '../../types/SirvCdnTokenResponse';
-import { Observable, map, tap } from 'rxjs';
-
-interface FolderContentsCdnResponse {
-  contents: FileDataCdn
-}
-interface FileDataCdn {
-  filename: string;
-  meta: FileMetaData;
-}
-
-interface FileMetaData {
-  width: number;
-  height: number;
-}
+import { SirvCdnTokenResponse, SirvCdnFileData } from './sirv-cdn.types'
+import { Observable, map } from 'rxjs';
 
 @Injectable()
 export class SirvCdnService {
@@ -58,7 +45,7 @@ export class SirvCdnService {
       .then(response => response.data);
   }
 
-  getTopicImages(topic: string): Observable<FileDataCdn[]> {
+  getTopicImages(topic: string): Observable<SirvCdnFileData[]> {
     return this.httpService.get(`${this.baseUrl}/files/readdir?dirname=/Images/topics/${topic}`)
       .pipe(map(({ data }) => data.contents));
   }
