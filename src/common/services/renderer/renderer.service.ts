@@ -28,6 +28,9 @@ export class RendererService {
   }
 
   splitSubtitle(subtitle: string): string[] {
+    if (!subtitle) {
+      return [];
+    }
     if (subtitle.length > this.maxSubtitleLength) {
       throw new BadRequestException('The subtitle must not exceed 200 characters');
     }

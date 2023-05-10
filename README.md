@@ -40,11 +40,11 @@ After running the app with one of the commands above, you should be able to acce
 
 In order to generate the image, the renderer expects the following query parameters:
 
-| Field    | Type   | Required | Constraints                                          |
-|----------|--------|----------|------------------------------------------------------|
-| title    | string | true     |                                                      |
-| subtitle | string | false    | 200 characters max                                   |
-| uid      | enum   | true     | Must be one of the following values: gunther.revollo |
-| topic    | enum   | true     | Must be one of the following values: birthday        |
-| name     | string | true     |                                                      |
-| date     | string | false    |                                                      |
+| Query param | Type   | Required | Allowed values                                      | Default value (if not provided) | Constraints                |
+|-------------|--------|----------|-----------------------------------------------------|---------------------------------|----------------------------|
+| title       | string | false    |                                                     | Congratulations!                |                            |
+| subtitle    | string | false    |                                                     |                                 | Max length: 200 characters |
+| uid         | enum   | false    | ['gunther.revollo', 'diego.landa', 'arleth.vargas'] | (Generic photo)                 |                            |
+| topic       | enum   | true     | ['birthday', 'promotion']                           |                                 |                            |
+| name        | string | true     |                                                     |                                 |                            |
+| date        | string | false    |                                                     |                                 |                            |
