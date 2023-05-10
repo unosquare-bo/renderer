@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Observable } from 'rxjs';
 
 interface ImageDataAPI {
@@ -13,18 +13,17 @@ interface ImageDataAPI {
 
 @Injectable()
 export class SlackBotApiService {
-  constructor(private configService: ConfigService) {
-    this.httpService = new HttpService();
+  constructor(private configService: ConfigService, private readonly httpService: HttpService) {
     this.httpService.axiosRef.interceptors.request.use(config => {
       if (config.url.includes(this.configService.get('SLACKBOT_API_URL'))) {
-        console.log('slack request');
         return {
           ...config,
           headers: { ...config.headers, Authorization: `Bearer ${this.token}` }
-        }
+        } as InternalAxiosRequestConfig;
       }
       return config;
-    });
+    }
+    );
     this.httpService.axiosRef.interceptors.response.use(
       response => {
         return response;
@@ -32,13 +31,10 @@ export class SlackBotApiService {
       async error => {
         const originalConfig = error.config;
         if (originalConfig.url.includes(this.configService.get('SLACKBOT_API_URL'))) {
-          console.log('slack fail 1');
           if (error.response.status === 401 && !originalConfig._retry) {
-            console.log('slack fail 2');
             originalConfig._retry = true;
             const { token } = await this.refreshToken();
             this.token = token;
-            console.log('setTokenSlack', this.token);
             originalConfig.headers.Authorization = `Bearer ${token}`;
             return this.httpService.axiosRef(originalConfig);
           }
@@ -50,7 +46,6 @@ export class SlackBotApiService {
 
   baseUrl = this.configService.get('SLACKBOT_API_URL');
   token = '';
-  httpService = null;
 
   async refreshToken(): Promise<{ token: string }> {
     return this.httpService.axiosRef.post(`${this.baseUrl}/auth/signin`, {
