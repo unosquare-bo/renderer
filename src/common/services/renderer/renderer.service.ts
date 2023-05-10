@@ -48,13 +48,13 @@ export class RendererService {
 
   getImagesForTopic(topic: string): Observable<ImageData[]> {
     return this.sirvCdnService.getTopicImages(topic).pipe(
-      switchMap(({ data: cdnImages }) => {
+      switchMap(cdnImages => {
         const fileNames = cdnImages.map(({ filename }) => filename);
         return this.slackBotApiService.getImagesData(fileNames)
           .pipe(
-            map(({ data: imagesData }) => {
+            map(({ data }) => {
               return cdnImages.map(({ filename, meta }) => {
-                const file = imagesData.find(({ fileName }) => fileName === filename);
+                const file = data.find(({ fileName }) => fileName === filename);
                 return { ...file, width: meta.width, height: meta.height };
               });
             }))

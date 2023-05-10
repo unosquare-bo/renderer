@@ -13,39 +13,47 @@ interface ImageDataAPI {
 
 @Injectable()
 export class SlackBotApiService {
-  constructor(private configService: ConfigService, private readonly httpService: HttpService) {
-    this.h1 = httpService;
-    this.h1.axiosRef.interceptors.response.use(config => {
-      console.log('getTokenSlack', this.token);
-      return {
-        ...config,
-        headers: { ...config.headers, Authorization: `Bearer ${this.token}` }
+  constructor(private configService: ConfigService) {
+    this.httpService = new HttpService();
+    this.httpService.axiosRef.interceptors.request.use(config => {
+      if (config.url.includes(this.configService.get('SLACKBOT_API_URL'))) {
+        console.log('slack request');
+        return {
+          ...config,
+          headers: { ...config.headers, Authorization: `Bearer ${this.token}` }
+        }
       }
+      return config;
     });
-    this.h1.axiosRef.interceptors.response.use(
+    this.httpService.axiosRef.interceptors.response.use(
       response => {
         return response;
       },
       async error => {
-        console.log('errorslack');
         const originalConfig = error.config;
-        if (error.response.status === 401 && !originalConfig._retry) {
-          originalConfig._retry = true;
-          const { token } = await this.refreshToken();
-          this.token = token;
-          console.log('setTokenSlack', this.token);
-          originalConfig.headers.Authorization = `Bearer ${token}`;
-          return this.h1.axiosRef(originalConfig);
+        if (originalConfig.url.includes(this.configService.get('SLACKBOT_API_URL'))) {
+          console.log('slack fail 1');
+          if (error.response.status === 401 && !originalConfig._retry) {
+            console.log('slack fail 2');
+            originalConfig._retry = true;
+            const { token } = await this.refreshToken();
+            this.token = token;
+            console.log('setTokenSlack', this.token);
+            originalConfig.headers.Authorization = `Bearer ${token}`;
+            return this.httpService.axiosRef(originalConfig);
+          }
+          return Promise.reject(error);
         }
+        return Promise.reject(error);
       });
   }
 
   baseUrl = this.configService.get('SLACKBOT_API_URL');
   token = '';
-  h1 = null;
+  httpService = null;
 
   async refreshToken(): Promise<{ token: string }> {
-    return this.h1.axiosRef.post(`${this.baseUrl}/auth/signin`, {
+    return this.httpService.axiosRef.post(`${this.baseUrl}/auth/signin`, {
       email: 'test@test.com',
       password: 'password'
     })
@@ -54,6 +62,6 @@ export class SlackBotApiService {
 
   getImagesData(fileNames: string[]): Observable<AxiosResponse<ImageDataAPI[]>> {
     const fileNamesString = fileNames.join(',');
-    return this.h1.get(`${this.baseUrl}/image/names/${fileNamesString}`)
+    return this.httpService.get(`${this.baseUrl}/image/names/${fileNamesString}`)
   }
 }
