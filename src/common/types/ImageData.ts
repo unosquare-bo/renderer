@@ -1,5 +1,5 @@
 export default interface ImageData {
-  imageKey: string;
+  fileName: string;
   x: number;
   y: number;
   width: number;

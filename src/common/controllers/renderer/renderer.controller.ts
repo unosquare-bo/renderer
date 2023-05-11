@@ -2,6 +2,7 @@ import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('renderer')
 export class RendererController {
@@ -35,9 +36,9 @@ export class RendererController {
 
     context.drawImage(background, 0, 0, 1920, 1080);
 
-    const topicImages = this.rendererService.getImagesForTopic(query.topic);
-    for (const { imageKey, x, y, width, height } of topicImages) {
-      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/${imageKey}`);
+    const topicImages = await firstValueFrom(this.rendererService.getImagesForTopic(query.topic));
+    for (const { fileName, x, y, width, height } of topicImages) {
+      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/topics/${query.topic}/${fileName}`);
       context.drawImage(image, x, y, width, height);
     }
 

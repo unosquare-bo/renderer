@@ -1,25 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import ImageData from '../../types/ImageData';
+import { SirvCdnService } from '../sirv-cdn/sirv-cdn.service';
+import { Observable, map, switchMap } from 'rxjs';
+import { SlackBotApiService } from '../slack-bot-api/slack-bot-api.service';
 
 @Injectable()
 export class RendererService {
+  constructor(
+    private readonly sirvCdnService: SirvCdnService,
+    private readonly slackBotApiService: SlackBotApiService
+  ) { }
+
   genericTitle = 'Congratulations!';
-  topicImages = {
-    birthday: [
-      {
-        imageKey: 'cake.png',
-        x: 120,
-        y: 80,
-        width: 640,
-        height: 463
-      }
-    ],
-    sat: [],
-    bonus: [],
-    promotion: [],
-    anniversary: [],
-    congrats: []
-  };
   charactersPerLine = 40;
   maxSubtitleLength = 200;
 
@@ -47,7 +39,18 @@ export class RendererService {
     return lines;
   }
 
-  getImagesForTopic(topic: string): ImageData[] {
-    return this.topicImages[topic] || [];
+  getImagesForTopic(topic: string): Observable<ImageData[]> {
+    return this.sirvCdnService.getTopicImages(topic).pipe(
+      switchMap(cdnImages => {
+        const fileNames = cdnImages.map(({ filename }) => filename);
+        return this.slackBotApiService.getImagesData(fileNames)
+          .pipe(
+            map(imagesData => {
+              return cdnImages.map(({ filename, meta }) => {
+                const file = imagesData.find(({ fileName }) => fileName === filename);
+                return { ...file, width: meta.width, height: meta.height };
+              });
+            }))
+      }));
   }
 }
