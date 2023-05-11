@@ -27,13 +27,18 @@ describe('RendererService', () => {
     expect(title).toBe('Congratulations!');
   });
 
-  it('should throw exception if subtitle exceeds characters', async () => {
+  it('should throw exception if subtitle exceeds characters', () => {
     const longText = 'Test test test test test test test test test test test test test test test test test test test test Test test test test test test test test test test test test test test test test test test test test test test test test test';
     try {
-      await service.splitSubtitle(longText);
+      service.splitSubtitle(longText);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestException);
     }
+  });
+
+  it('should return empty array if subtitle is null', () => {
+    const subtitle = service.splitSubtitle(null);
+    expect(subtitle).toBe([]);
   });
 
   it('should return text split in 5 lines', () => {
