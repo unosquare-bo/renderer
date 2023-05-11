@@ -1,31 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SirvCdnService } from './sirv-cdn.service';
+import { SlackBotApiService } from './slack-bot-api.service';
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
-import { SirvCdnFileData, SirvCdnTokenResponse } from './sirv-cdn.types';
+import { SlackBotApiImageData, SlackBotApiTokenResponse } from './slack-bot-api.types';
 
 const moduleMocker = new ModuleMocker(global);
 
-describe('SirvCdnService', () => {
-  let service: SirvCdnService;
-  const tokenResponse: SirvCdnTokenResponse = {
+describe('SlackBotApiService', () => {
+  let service: SlackBotApiService;
+  const tokenResponse: SlackBotApiTokenResponse = {
     token: 'fakeToken',
-    expiresIn: 1000,
   };
-  const topicImages: SirvCdnFileData[] = [
-    { filename: 'cake.png', meta: { width: 500, height: 600 } },
-    { filename: 'balloons.png', meta: { width: 150, height: 400 } },
+  const imagesData: SlackBotApiImageData[] = [
+    { id: 1, fileName: 'cake.png', x: 120, y: 80 },
+    { id: 2, fileName: 'balloons.png', x: 10, y: 20 },
   ];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SirvCdnService],
+      providers: [SlackBotApiService],
     })
       .useMocker(token => {
         if (token === HttpService) {
           return {
-            get: jest.fn(() => of({ data: { contents: topicImages } })),
+            get: jest.fn(() => of({ data: imagesData })),
             axiosRef: {
               interceptors: { request: { use: jest.fn() }, response: { use: jest.fn() } },
               post: jest.fn().mockResolvedValue({ data: tokenResponse })
@@ -40,7 +39,7 @@ describe('SirvCdnService', () => {
       })
       .compile();
 
-    service = module.get<SirvCdnService>(SirvCdnService);
+    service = module.get<SlackBotApiService>(SlackBotApiService);
   });
 
   it('should be defined', () => {
@@ -51,10 +50,10 @@ describe('SirvCdnService', () => {
     expect(await service.refreshToken()).toEqual(tokenResponse);
   });
 
-  it('should get two images (cake and balloons) for topic birthday', done => {
-    const topic = 'birthday';
-    service.getTopicImages(topic).subscribe(response => {
-      expect(response).toEqual(topicImages);
+  it('should get two images data for file names [cake.png, balloons.png]', done => {
+    const fileNames = ['cake.png', 'birthday.png'];
+    service.getImagesData(fileNames).subscribe(response => {
+      expect(response).toEqual(imagesData);
       done();
     });
   });
