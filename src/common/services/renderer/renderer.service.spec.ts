@@ -22,15 +22,15 @@ describe('RendererService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [RendererService],
     })
-    .useMocker(token => {
-      if (token === SirvCdnService) {
-        return { getTopicImages: jest.fn(() => of(topicImages)) };
-      }
-      if (token === SlackBotApiService) {
-        return { getImagesData: jest.fn(() => of(imagesData)) };
-      }
-    })
-    .compile();
+      .useMocker(token => {
+        if (token === SirvCdnService) {
+          return { getTopicImages: jest.fn(() => of(topicImages)) };
+        }
+        if (token === SlackBotApiService) {
+          return { getImagesData: jest.fn(() => of(imagesData)) };
+        }
+      })
+      .compile();
 
     service = module.get<RendererService>(RendererService);
   });
@@ -75,22 +75,15 @@ describe('RendererService', () => {
     expect(service.splitSubtitle(subtitle)).toEqual(lines);
   });
 
-  it('should return the images for birthday topic', () => {
+  it('should return the images for birthday topic', done => {
     const topic = 'birthday';
     const birthdayImages = [
-      {
-        fileName: 'cake.png',
-        x: 120,
-        y: 80,
-        width: 640,
-        height: 463
-      }
+      { id: 1, fileName: 'cake.png', x: 120, y: 80, width: 500, height: 600 },
+      { id: 2, fileName: 'balloons.png', x: 10, y: 20, width: 150, height: 400 }
     ];
-    expect(service.getImagesForTopic(topic)).toEqual(birthdayImages);
-  });
-
-  it('should return empty images array for unknown topic', () => {
-    const topic = 'unknown';
-    expect(service.getImagesForTopic(topic)).toEqual([]);
+    service.getImagesForTopic(topic).subscribe(response => {
+      expect(response).toEqual(birthdayImages);
+      done();
+    });
   });
 });

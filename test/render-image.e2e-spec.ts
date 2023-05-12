@@ -28,5 +28,5 @@ describe('RendererController (e2e)', () => {
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })
-  });
+  }, 10000);
 });

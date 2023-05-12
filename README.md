@@ -44,7 +44,7 @@ In order to generate the image, the renderer expects the following query paramet
 |-------------|--------|----------|-----------------------------------------------------|---------------------------------|----------------------------|
 | title       | string | false    |                                                     | Congratulations!                |                            |
 | subtitle    | string | false    |                                                     |                                 | Max length: 200 characters |
-| uid         | enum   | false    | ['gunther.revollo', 'diego.landa', 'arleth.vargas'] | (Generic photo)                 |                            |
+| uid         | enum   | false    | ['gunther.revollo', 'diego.landa', 'arleth.vargas'] | [(Generic photo)](https://grandint.sirv.com/Images/default.jpg)                 |                            |
 | topic       | enum   | true     | ['birthday', 'promotion']                           |                                 |                            |
 | name        | string | true     |                                                     |                                 |                            |
 | date        | string | false    |                                                     |                                 |                            |
