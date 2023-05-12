@@ -1,7 +1,7 @@
 import { HttpService } from "@nestjs/axios";
 import TokenUtils from "../types/TokenUtils";
 
-export default function addInterceptors(httpService: HttpService, urlToValidate: string, tokenUtils: TokenUtils): HttpService {
+export default function addTokenInterceptors(httpService: HttpService, urlToValidate: string, tokenUtils: TokenUtils): HttpService {
   httpService.axiosRef.interceptors.request.use(config => {
     if (config.url.includes(urlToValidate)) {
       config.headers.Authorization = `Bearer ${tokenUtils.getToken()}`;

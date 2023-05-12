@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map } from 'rxjs';
 import { SlackBotApiTokenResponse, SlackBotApiImageData } from './slack-bot-api.types';
-import addInterceptors from 'src/common/utils/add-interceptor.util';
+import addTokenInterceptors from 'src/common/utils/add-token-interceptors.util';
 
 @Injectable()
 export class SlackBotApiService {
@@ -15,7 +15,7 @@ export class SlackBotApiService {
       },
       refreshToken: this.refreshToken.bind(this)
     }
-    this.httpService = addInterceptors(httpService, this.configService.get('SLACKBOT_API_URL'), tokenUtils);
+    this.httpService = addTokenInterceptors(httpService, this.configService.get('SLACKBOT_API_URL'), tokenUtils);
   }
 
   baseUrl = this.configService.get('SLACKBOT_API_URL');

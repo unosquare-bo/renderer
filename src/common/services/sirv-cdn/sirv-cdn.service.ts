@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SirvCdnTokenResponse, SirvCdnFileData } from './sirv-cdn.types'
 import { Observable, map } from 'rxjs';
-import addInterceptors from '../../utils/add-interceptor.util';
+import addTokenInterceptors from '../../utils/add-token-interceptors.util';
 
 @Injectable()
 export class SirvCdnService {
@@ -15,7 +15,7 @@ export class SirvCdnService {
       },
       refreshToken: this.refreshToken.bind(this)
     }
-    this.httpService = addInterceptors(httpService, this.configService.get('CDN_API_URL'), tokenUtils);
+    this.httpService = addTokenInterceptors(httpService, this.configService.get('CDN_API_URL'), tokenUtils);
   }
 
   baseUrl = this.configService.get('CDN_API_URL');
