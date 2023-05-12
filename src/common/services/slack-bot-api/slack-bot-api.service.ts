@@ -12,8 +12,7 @@ export class SlackBotApiService {
         config.headers.Authorization = `Bearer ${this.token}`
       }
       return config;
-    }
-    );
+    });
     this.httpService.axiosRef.interceptors.response.use(
       response => {
         return response;
