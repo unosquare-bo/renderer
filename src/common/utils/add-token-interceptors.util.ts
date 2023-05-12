@@ -5,6 +5,8 @@ export default function addTokenInterceptors(httpService: HttpService, urlToVali
   httpService.axiosRef.interceptors.request.use(config => {
     if (config.url.includes(urlToValidate)) {
       config.headers.Authorization = `Bearer ${tokenUtils.getToken()}`;
+      console.log('success')
+      console.log(config)
     }
     return config;
   });
@@ -13,6 +15,8 @@ export default function addTokenInterceptors(httpService: HttpService, urlToVali
       return response;
     },
     async error => {
+      console.log('errorststus')
+      console.log(error.response)
       const originalConfig = error.config;
       if (
         originalConfig.url.includes(urlToValidate) &&
@@ -21,6 +25,8 @@ export default function addTokenInterceptors(httpService: HttpService, urlToVali
       ) {
         originalConfig._retry = true;
         const { token } = await tokenUtils.refreshToken();
+        console.log('token')
+        console.log(token)
         tokenUtils.setToken(token);
         originalConfig.headers.Authorization = `Bearer ${token}`;
         return httpService.axiosRef(originalConfig);

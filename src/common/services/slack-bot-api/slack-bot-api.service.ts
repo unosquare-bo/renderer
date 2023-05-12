@@ -10,7 +10,7 @@ export class SlackBotApiService {
   constructor(private configService: ConfigService, private httpService: HttpService) {
     const tokenUtils = {
       getToken: () => this.token,
-      setToken: (token) => {
+      setToken: (token: string) => {
         this.token = token;
       },
       refreshToken: this.refreshToken.bind(this)
