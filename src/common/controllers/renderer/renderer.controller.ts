@@ -1,16 +1,18 @@
-import { Controller, Get, StreamableFile, Header, Query } from '@nestjs/common';
+import { Controller, Get, StreamableFile, Header, Query, ValidationPipe, UsePipes } from '@nestjs/common';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { RendererService } from '../../services/renderer/renderer.service';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
+import { RendererParameters } from '../../types/RendererParameters';
 
 @Controller('renderer')
 export class RendererController {
   constructor(private readonly rendererService: RendererService, private configService: ConfigService) { }
 
   @Get()
+  @UsePipes(new ValidationPipe())
   @Header('Content-Type', 'image/png')
-  async renderCongrats(@Query() query): Promise<StreamableFile> {
+  async renderCongrats(@Query() query: RendererParameters): Promise<StreamableFile> {
     const width = 1920;
     const height = 1080;
 
