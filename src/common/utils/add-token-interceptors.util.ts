@@ -23,7 +23,9 @@ export default function addTokenInterceptors(httpService: HttpService, urlToVali
         const { token } = await tokenUtils.refreshToken();
         tokenUtils.setToken(token);
         originalConfig.headers.Authorization = `Bearer ${token}`;
-        return httpService.axiosRef.post(originalConfig);
+        return ['get', 'delete'].includes(originalConfig.method)
+          ? httpService.axiosRef[originalConfig.method](originalConfig.url, originalConfig)
+          : httpService.axiosRef[originalConfig.method](originalConfig.url, originalConfig.data, originalConfig);
       }
       return Promise.reject(error);
     });

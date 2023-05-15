@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map } from 'rxjs';
 import { SlackBotApiTokenResponse, SlackBotApiImageData } from './slack-bot-api.types';
-import addTokenInterceptors from 'src/common/utils/add-token-interceptors.util';
+import addTokenInterceptors from '../../utils/add-token-interceptors.util';
 
 @Injectable()
 export class SlackBotApiService {

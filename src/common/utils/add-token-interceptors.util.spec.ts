@@ -22,12 +22,12 @@ describe('addTokenInterceptors', () => {
     httpService = new HttpService();
     testToken = '';
     mockRejectionData = {
-      config: { url: fakeUrl, _retry: false, headers: {} },
+      config: { method: 'get', url: fakeUrl, _retry: false, headers: {} },
       response: { status: 401 },
     };
-    jest.spyOn(httpService.axiosRef, 'post').mockImplementation((config) => {
-      return Promise.resolve(config)
-    });
+    jest
+      .spyOn(httpService.axiosRef, 'get')
+      .mockImplementation((url, config) => Promise.resolve(config));
   });
 
   it('should have bearer token in header after rejection', async () => {
