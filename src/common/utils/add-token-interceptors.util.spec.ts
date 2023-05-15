@@ -1,43 +1,46 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import { HttpService } from '@nestjs/axios';
-import { of } from 'rxjs';
 import addTokenInterceptors from './add-token-interceptors.util';
 
-const moduleMocker = new ModuleMocker(global);
-
 describe('addTokenInterceptors', () => {
+  const tokenExpected = 'test';
+  const fakeUrl = 'test';
+
   let httpService: HttpService;
   let testToken = '';
+  const tokenUtils = {
+    getToken: () => testToken,
+    setToken: (token: string) => {
+      testToken = token;
+    },
+    refreshToken: () => {
+      return Promise.resolve({ token: tokenExpected });
+    }
+  }
 
   beforeEach(async () => {
     httpService = new HttpService();
+    testToken = '';
+    jest.spyOn(httpService.axiosRef, 'post').mockImplementation((config) => {
+      return Promise.resolve(config)
+    });
   });
 
-  it('should have token', async () => {
-    const tokenUtils = {
-      getToken: () => testToken,
-      setToken: (token: string) => {
-        testToken = token;
-      },
-      refreshToken: () => {
-        return Promise.resolve({ token: 'a' });
-      }
-    }
-
-    jest.spyOn(httpService, 'axiosRef').mockImplementation(async (config) => {
-      if (config) {
-        return Promise.resolve({})
-      }
-      return httpService.axiosRef;
-    })
-    httpService = addTokenInterceptors(httpService, 'test', tokenUtils);
+  it('should have bearer token in header after rejection', async () => {
+    httpService = addTokenInterceptors(httpService, fakeUrl, tokenUtils);
     const rejected = await (httpService.axiosRef.interceptors.response as any).handlers[0].rejected({
-      config: { url: 'test', _retry: false, headers: {} },
+      config: { url: fakeUrl, _retry: false, headers: {} },
       response: { status: 401 },
     });
-    console.log(rejected)
-    console.log((httpService.axiosRef.interceptors.request as any).handlers[0].fulfilled({ url: 'test', headers: {} }))
-    expect(true).toBe(true);
+    expect(rejected.headers.Authorization).toBe(`Bearer ${tokenExpected}`);
+  });
+
+  it('should have bearer token in header after rejection and new request afterwards', async () => {
+    httpService = addTokenInterceptors(httpService, fakeUrl, tokenUtils);
+    await (httpService.axiosRef.interceptors.response as any).handlers[0].rejected({
+      config: { url: fakeUrl, _retry: false, headers: {} },
+      response: { status: 401 },
+    });
+    const fulfilled = await (httpService.axiosRef.interceptors.request as any).handlers[0].fulfilled({ url: 'test', headers: {} })
+    expect(fulfilled.headers.Authorization).toBe(`Bearer ${tokenExpected}`);
   });
 });
