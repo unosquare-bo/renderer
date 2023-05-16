@@ -23,9 +23,6 @@ export class RendererService {
     if (!subtitle) {
       return [];
     }
-    if (subtitle.length > this.maxSubtitleLength) {
-      throw new BadRequestException('The subtitle must not exceed 200 characters');
-    }
 
     const words = subtitle.split(' ');
     const lines = [''];
