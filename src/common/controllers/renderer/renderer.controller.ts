@@ -4,13 +4,17 @@ import { RendererService } from '../../services/renderer/renderer.service';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { RendererParameters } from '../../types/RendererParameters';
+import { DateValidationFirstPipe } from '../../pipes/date-validation-first.pipe';
 
 @Controller('renderer')
 export class RendererController {
   constructor(private readonly rendererService: RendererService, private configService: ConfigService) { }
 
   @Get()
-  @UsePipes(new ValidationPipe())
+  @UsePipes(
+    new DateValidationFirstPipe(),
+    new ValidationPipe({ transform: true })
+    )
   @Header('Content-Type', 'image/png')
   async renderCongrats(@Query() query: RendererParameters): Promise<StreamableFile> {
     const width = 1920;
@@ -18,7 +22,7 @@ export class RendererController {
 
     // Add post object with the content to render
     const post = {
-      title: this.rendererService.getTitle(query.title),
+      title: query.title,
       subtitle: this.rendererService.splitSubtitle(query.subtitle)
     }
 

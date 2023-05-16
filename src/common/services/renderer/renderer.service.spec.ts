@@ -39,16 +39,6 @@ describe('RendererService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return Happy Birthday if title is Happy Birthday', () => {
-    const title = service.getTitle('Happy Birthday!');
-    expect(title).toBe('Happy Birthday!');
-  });
-
-  it('should return Congratulations if no title is provided', () => {
-    const title = service.getTitle(null);
-    expect(title).toBe('Congratulations!');
-  });
-
   it('should throw exception if subtitle exceeds characters', () => {
     const longText = 'Test test test test test test test test test test test test test test test test test test test test Test test test test test test test test test test test test test test test test test test test test test test test test test';
     try {
