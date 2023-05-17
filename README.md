@@ -40,11 +40,11 @@ After running the app with one of the commands above, you should be able to acce
 
 In order to generate the image, the renderer expects the following query parameters:
 
-| Query param | Type   | Required | Allowed values                                      | Default value (if not provided) | Constraints                |
-|-------------|--------|----------|-----------------------------------------------------|---------------------------------|----------------------------|
-| title       | string | false    |                                                     | Congratulations!                |                            |
-| subtitle    | string | false    |                                                     |                                 | Max length: 200 characters |
-| uid         | enum   | false    | ['gunther.revollo', 'diego.landa', 'arleth.vargas'] | [(Generic photo)](https://grandint.sirv.com/Images/default.jpg)                 |                            |
-| topic       | enum   | true     | ['birthday', 'promotion']                           |                                 |                            |
-| name        | string | true     |                                                     |                                 |                            |
-| date        | string | false    |                                                     |                                 |                            |
+| Query param | Type   | Required | Allowed values                                      | Default value (if not provided)                                 | Constraints                               |
+|-------------|--------|----------|-----------------------------------------------------|-----------------------------------------------------------------|-------------------------------------------|
+| title       | string | false    |                                                     | Congratulations!                                                |                                           |
+| subtitle    | string | false    |                                                     |                                                                 | Max length: 200 characters                |
+| uid         | enum   | false    | ['gunther.revollo', 'diego.landa', 'arleth.vargas'] | [(Generic photo)](https://grandint.sirv.com/Images/default.jpg) |                                           |
+| topic       | enum   | true     | ['birthday', 'promotion']                           |                                                                 |                                           |
+| name        | string | true     |                                                     |                                                                 |                                           |
+| date        | string | false    |                                                     |                                                                 | Should be in ISO-8601 format (YYYY-MM-DD) |
