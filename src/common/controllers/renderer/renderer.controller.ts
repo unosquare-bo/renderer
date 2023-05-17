@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { RendererParameters } from '../../types/RendererParameters';
 import { DateValidationFirstPipe } from '../../pipes/date-validation-first.pipe';
+import { TopicExistsPipe } from 'src/common/pipes/topic-exists.pipe';
 
 @Controller('renderer')
 export class RendererController {
@@ -16,7 +17,7 @@ export class RendererController {
     new ValidationPipe({ transform: true })
     )
   @Header('Content-Type', 'image/png')
-  async renderCongrats(@Query() query: RendererParameters): Promise<StreamableFile> {
+  async renderCongrats(@Query(TopicExistsPipe) query: RendererParameters): Promise<StreamableFile> {
     const width = 1920;
     const height = 1080;
 
