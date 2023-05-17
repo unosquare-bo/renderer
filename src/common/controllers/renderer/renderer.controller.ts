@@ -5,7 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { RendererParameters } from '../../types/RendererParameters';
 import { DateValidationFirstPipe } from '../../pipes/date-validation-first.pipe';
-import { TopicExistsPipe } from 'src/common/pipes/topic-exists.pipe';
+import { TopicExistsPipe } from '../../pipes/topic-exists.pipe';
+import { UidExistsPipe } from '../../pipes/uid-exists.pipe';
 
 @Controller('renderer')
 export class RendererController {
@@ -13,11 +14,11 @@ export class RendererController {
 
   @Get()
   @UsePipes(
-    new DateValidationFirstPipe(),
+    DateValidationFirstPipe,
     new ValidationPipe({ transform: true })
-    )
+  )
   @Header('Content-Type', 'image/png')
-  async renderCongrats(@Query(TopicExistsPipe) query: RendererParameters): Promise<StreamableFile> {
+  async renderCongrats(@Query(TopicExistsPipe, UidExistsPipe) query: RendererParameters): Promise<StreamableFile> {
     const cdnUrl = this.configService.get('CDN_URL');
     const width = 1920;
     const height = 1080;
@@ -32,16 +33,11 @@ export class RendererController {
     const context = canvas.getContext("2d");
 
     const background = await loadImage(`${cdnUrl}/Images/background.jpg`);
-    const confetti = await loadImage(`${cdnUrl}/Images/confetti.png`);
-
-    let user
-    try {
-      user = await loadImage(`${cdnUrl}/Images/users/${query.uid}.jpg`)
-    } catch (error) {
-      user = await loadImage(`${cdnUrl}/Images/default.jpg`);
-    }
-
     context.drawImage(background, 0, 0, 1920, 1080);
+
+    // add confetti
+    const confetti = await loadImage(`${cdnUrl}/Images/confetti.png`);
+    context.drawImage(confetti, 896, 120, 1024, 678);
 
     const topicImages = await firstValueFrom(this.rendererService.getImagesForTopic(query.topic));
     for (const { fileName, x, y, width, height } of topicImages) {
@@ -49,9 +45,8 @@ export class RendererController {
       context.drawImage(image, x, y, width, height);
     }
 
-    // add confetti
-    context.drawImage(confetti, 896, 120, 1024, 678);
     // Render User
+    const user = await loadImage(`${cdnUrl}/Images/users/${query.uid}.jpg`);
     context.drawImage(user, width - 640, 320, 320, 320);
 
     // Set the style of the test and render it to the canvas

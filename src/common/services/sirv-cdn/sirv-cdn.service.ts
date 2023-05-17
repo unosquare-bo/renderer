@@ -41,4 +41,8 @@ export class SirvCdnService {
   getTopics(): Observable<SirvCdnFileData[]> {
     return this.getFolderContents('/Images/topics');
   }
+
+  getUsers(): Observable<SirvCdnFileData[]> {
+    return this.getFolderContents('/Images/users');
+  }
 }

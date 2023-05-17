@@ -12,7 +12,7 @@ export class RendererParameters {
   subtitle: string;
 
   @IsOptional()
-  uid: string;
+  uid: string = 'default';
 
   @Transform(({ value }) => new Date(value).toLocaleDateString('en-US', {
     year: 'numeric',
