@@ -25,4 +25,3 @@ export class RendererParameters {
   @IsNotEmpty()
   topic: string;
 }
-/* todo sirvcdn para validar uid, sirvcdn para validar topic, tests */

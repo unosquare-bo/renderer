@@ -17,6 +17,15 @@ describe('SirvCdnService', () => {
     { filename: 'cake.png', meta: { width: 500, height: 600 } },
     { filename: 'balloons.png', meta: { width: 150, height: 400 } },
   ];
+  const topics: SirvCdnFileData[] = [
+    { filename: 'birthday', meta: {} },
+    { filename: 'promotion', meta: {} },
+  ];
+  const users: SirvCdnFileData[] = [
+    { filename: 'arleth.vargas.jpg', meta: { width: 350, height: 350 } },
+    { filename: 'diego.landa.jpg', meta: { width: 350, height: 350 } },
+    { filename: 'gunther.revollo.jpg', meta: { width: 350, height: 350 } },
+  ];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -52,6 +61,14 @@ describe('SirvCdnService', () => {
   });
 
   it('should get two images (cake and balloons) for topic birthday', done => {
+    const topic = 'birthday';
+    service.getTopicImages(topic).subscribe(response => {
+      expect(response).toEqual(topicImages);
+      done();
+    });
+  });
+
+  it('should get two topics', done => {
     const topic = 'birthday';
     service.getTopicImages(topic).subscribe(response => {
       expect(response).toEqual(topicImages);
