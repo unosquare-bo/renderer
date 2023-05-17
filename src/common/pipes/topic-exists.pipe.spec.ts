@@ -7,20 +7,21 @@ import { of } from 'rxjs';
 
 describe('TopicExistsPipe', () => {
   let pipe: TopicExistsPipe;
+  let parameters: RendererParameters;
   const topicsResponse: SirvCdnFileData[] = [
     { filename: 'birthday', meta: {} },
     { filename: 'promotion', meta: {} }
   ];
-  const parameters: RendererParameters = {
-    name: 'John Doe',
-    title: 'Happy birthday',
-    subtitle: 'We wish you a happy birthday',
-    topic: 'unknown',
-    uid: 'gunther.revollo',
-    date: '2023-05-01'
-  };
 
   beforeEach(async () => {
+    parameters = {
+      name: 'John Doe',
+      title: 'Happy birthday',
+      subtitle: 'We wish you a happy birthday',
+      topic: '',
+      uid: 'gunther.revollo',
+      date: '2023-05-01'
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [TopicExistsPipe],
     })
@@ -36,6 +37,7 @@ describe('TopicExistsPipe', () => {
   });
 
   it('should throw not found exception if topic does not exist', async () => {
+    parameters.topic = 'unknown';
     try {
       await pipe.transform(parameters);
     } catch (error) {
@@ -44,8 +46,8 @@ describe('TopicExistsPipe', () => {
   });
 
   it('should return same parameters if topic exists', async () => {
-    const birthdayParameters = { ...parameters, topic: 'birthday' }
-    const value = await pipe.transform(birthdayParameters);
-    expect(value).toEqual(birthdayParameters);
+    parameters.topic = 'birthday';
+    const value = await pipe.transform(parameters);
+    expect(value).toEqual(parameters);
   });
 });
