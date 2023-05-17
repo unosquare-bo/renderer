@@ -18,6 +18,7 @@ export class RendererController {
     )
   @Header('Content-Type', 'image/png')
   async renderCongrats(@Query(TopicExistsPipe) query: RendererParameters): Promise<StreamableFile> {
+    const cdnUrl = this.configService.get('CDN_URL');
     const width = 1920;
     const height = 1080;
 
@@ -30,22 +31,21 @@ export class RendererController {
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
 
-    const background = await loadImage('https://grandint.sirv.com/Images/background.jpg');
-    const confetti = await loadImage('https://grandint.sirv.com/Images/confetti.png');
+    const background = await loadImage(`${cdnUrl}/Images/background.jpg`);
+    const confetti = await loadImage(`${cdnUrl}/Images/confetti.png`);
 
     let user
     try {
-      user = await loadImage(`https://grandint.sirv.com/Images/users/${query.uid}.jpg`)
+      user = await loadImage(`${cdnUrl}/Images/users/${query.uid}.jpg`)
     } catch (error) {
-      console.log(error)
-      user = await loadImage('https://grandint.sirv.com/Images/default.jpg');
+      user = await loadImage(`${cdnUrl}/Images/default.jpg`);
     }
 
     context.drawImage(background, 0, 0, 1920, 1080);
 
     const topicImages = await firstValueFrom(this.rendererService.getImagesForTopic(query.topic));
     for (const { fileName, x, y, width, height } of topicImages) {
-      const image = await loadImage(`${this.configService.get('CDN_URL')}/Images/topics/${query.topic}/${fileName}`);
+      const image = await loadImage(`${cdnUrl}/Images/topics/${query.topic}/${fileName}`);
       context.drawImage(image, x, y, width, height);
     }
 
