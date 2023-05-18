@@ -26,6 +26,9 @@ describe('SirvCdnService', () => {
     { filename: 'diego.landa.jpg', meta: { width: 350, height: 350 } },
     { filename: 'gunther.revollo.jpg', meta: { width: 350, height: 350 } },
   ];
+  const birthdayTopicUrl = '/Images/topics/birthday';
+  const topicsUrl = '/Images/topics';
+  const usersUrl = '/Images/users';
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +37,17 @@ describe('SirvCdnService', () => {
       .useMocker(token => {
         if (token === HttpService) {
           return {
-            get: jest.fn(() => of({ data: { contents: topicImages } })),
+            get: jest.fn((url) => {
+              if (url.includes(birthdayTopicUrl)) {
+                return of({ data: { contents: topicImages } });
+              }
+              if (url.includes(topicsUrl)) {
+                return of({ data: { contents: topics } });
+              }
+              if (url.includes(usersUrl)) {
+                return of({ data: { contents: users } });
+              }
+            }),
             axiosRef: {
               interceptors: { request: { use: jest.fn() }, response: { use: jest.fn() } },
               post: jest.fn().mockResolvedValue({ data: tokenResponse })
@@ -69,9 +82,15 @@ describe('SirvCdnService', () => {
   });
 
   it('should get two topics', done => {
-    const topic = 'birthday';
-    service.getTopicImages(topic).subscribe(response => {
-      expect(response).toEqual(topicImages);
+    service.getTopics().subscribe(response => {
+      expect(response).toEqual(topics);
+      done();
+    });
+  });
+
+  it('should get three users', done => {
+    service.getUsers().subscribe(response => {
+      expect(response).toEqual(users);
       done();
     });
   });
