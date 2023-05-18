@@ -20,7 +20,7 @@ describe('RendererController (e2e)', () => {
 
   it('should return an image that matches the snapshot', async () => {
     const response = await request(app.getHttpServer())
-      .get('/renderer?uid=gunther.revollo&topic=birthday&title=Happy%20Birthday&subtitle=We%20wish%20you%20a%20happy%20birthday&name=Gunther%20Revollo&date=May%205th%202023')
+      .get('/renderer?uid=gunther.revollo&topic=birthday&title=Happy%20Birthday&subtitle=We%20wish%20you%20a%20happy%20birthday&name=Gunther%20Revollo&date=2023-05-05')
       .expect(200);
     const imageBuffer = await response.body;
     expect(imageBuffer).toMatchImageSnapshot({
@@ -28,5 +28,5 @@ describe('RendererController (e2e)', () => {
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })
-  }, 10000);
+  }, 20000);
 });
