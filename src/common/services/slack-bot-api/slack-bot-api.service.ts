@@ -3,36 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Observable, map } from 'rxjs';
 import { SlackBotApiTokenResponse, SlackBotApiImageData } from './slack-bot-api.types';
+import addTokenInterceptors from '../../utils/add-token-interceptors.util';
 
 @Injectable()
 export class SlackBotApiService {
-  constructor(private configService: ConfigService, private readonly httpService: HttpService) {
-    this.httpService.axiosRef.interceptors.request.use(config => {
-      if (config.url.includes(this.configService.get('SLACKBOT_API_URL'))) {
-        config.headers.Authorization = `Bearer ${this.token}`
-      }
-      return config;
-    }
-    );
-    this.httpService.axiosRef.interceptors.response.use(
-      response => {
-        return response;
+  constructor(private configService: ConfigService, private httpService: HttpService) {
+    const tokenUtils = {
+      getToken: () => this.token,
+      setToken: (token: string) => {
+        this.token = token;
       },
-      async error => {
-        const originalConfig = error.config;
-        if (
-          originalConfig.url.includes(this.configService.get('SLACKBOT_API_URL')) &&
-          error.response.status === 401 &&
-          !originalConfig._retry
-        ) {
-          originalConfig._retry = true;
-          const { token } = await this.refreshToken();
-          this.token = token;
-          originalConfig.headers.Authorization = `Bearer ${token}`;
-          return this.httpService.axiosRef(originalConfig);
-        }
-        return Promise.reject(error);
-      });
+      refreshToken: this.refreshToken.bind(this)
+    }
+    this.httpService = addTokenInterceptors(httpService, this.configService.get('SLACKBOT_API_URL'), tokenUtils);
   }
 
   baseUrl = this.configService.get('SLACKBOT_API_URL');
