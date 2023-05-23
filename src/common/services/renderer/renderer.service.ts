@@ -11,20 +11,11 @@ export class RendererService {
     private readonly slackBotApiService: SlackBotApiService
   ) { }
 
-  genericTitle = 'Congratulations!';
   charactersPerLine = 40;
-  maxSubtitleLength = 200;
-
-  getTitle(title: string): string {
-    return title || this.genericTitle;
-  }
 
   splitSubtitle(subtitle: string): string[] {
     if (!subtitle) {
       return [];
-    }
-    if (subtitle.length > this.maxSubtitleLength) {
-      throw new BadRequestException('The subtitle must not exceed 200 characters');
     }
 
     const words = subtitle.split(' ');

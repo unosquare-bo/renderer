@@ -29,8 +29,20 @@ export class SirvCdnService {
       .then(response => response.data);
   }
 
-  getTopicImages(topic: string): Observable<SirvCdnFileData[]> {
-    return this.httpService.get(`${this.baseUrl}/files/readdir?dirname=/Images/topics/${topic}`)
+  private getFolderContents(folderPath: string): Observable<SirvCdnFileData[]> {
+    return this.httpService.get(`${this.baseUrl}/files/readdir?dirname=${folderPath}`)
       .pipe(map(({ data }) => data.contents));
+  }
+
+  getTopicImages(topic: string): Observable<SirvCdnFileData[]> {
+    return this.getFolderContents(`/Images/topics/${topic}`);
+  }
+
+  getTopics(): Observable<SirvCdnFileData[]> {
+    return this.getFolderContents('/Images/topics');
+  }
+
+  getUsers(): Observable<SirvCdnFileData[]> {
+    return this.getFolderContents('/Images/users');
   }
 }

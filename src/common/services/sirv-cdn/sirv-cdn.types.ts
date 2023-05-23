@@ -9,8 +9,8 @@ interface SirvCdnFileData {
 }
 
 interface FileMetaData {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
 }
 
 export { SirvCdnFileData, SirvCdnTokenResponse };
